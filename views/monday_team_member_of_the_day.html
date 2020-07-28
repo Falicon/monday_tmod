@@ -1,0 +1,257 @@
+<html>
+  <head>
+    <title></title>
+    <link rel="stylesheet" href="/css/bootstrap.css" type="text/css" />
+    <link rel="stylesheet" href="/css/monday.css" type="text/css" />
+    <link rel="stylesheet" href="/css/font-awesome.min.css" type="text/css" />
+    <link rel="stylesheet" href="/css/font.css" type="text/css" cache="false" />
+  </head>
+  <body>
+
+    <span id="tmod">
+      <div id="error" style="background-color:#fff;width:100%;height:100%;float:left;">
+        <div class="streamer-box small">
+          <div class="streamer-box-info">
+            <p></p>
+            <p class="streamer-box-header" id="" style="color:#333;">Picking your Team Member of the Day</p>
+            <img src="images/avatar.jpg" width="70" height="70" class="rounded-circle" />
+          </div>
+        </div>
+      </div>
+    </span>
+
+  </body>
+  <script src="/js/jquery.min.js"></script>
+  <script src="/js/bootstrap.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/monday-sdk-js/dist/main.js"></script>
+  <script type="text/javascript">
+
+    let tmod_background = '#fff';
+    let tmod_color = '#333';
+    let most_active_background = '#fff';
+    let most_active_color = '#333';
+    let show_most_active = false;
+    let shuffle_tmod = false;
+
+    let temp = new Date();
+    temp.setDate(temp.getDate() - 1);
+    let yesterday = stringify_date(temp);
+
+    /* render tmod */
+    function render_tmod(data) {
+      let html = '';
+
+      if (Object.keys(data).length > 0) {
+        // we have at least something to show
+        let tmod = data['tmod'];
+        let most_active = data['most_active'];
+
+        if (Object.keys(most_active).length == 0) {
+          // show a default message
+          most_active = {
+            'photo_thumb_small':'images/avatar.jpg',
+            'name':'No Activity Yesterday',
+            'title':'Good things take time.',
+          };
+        }
+
+        html += '<div id="tmod_background" style="background-color:' + tmod_background + ';width:50%;height:100%;float:left;">';
+        html += '  <div class="streamer-box small">';
+        html += '    <div class="streamer-box-info">';
+        html += '      <p></p>';
+        html += '      <p class="streamer-box-header" id="tmod_label" style="color:' + tmod_color + ';">Team Member<br />of the Day</p>';
+        html += '      <img src="' + tmod['photo_thumb_small'] + '" width="70" height="70" class="rounded-circle" />';
+        html += '      <p class="streamer-box-title" id="tmod_name" style="color:' + tmod_color + ';">' + tmod['name'] + '</p>';
+        if (tmod['title'].trim() != '') {
+          html += '    <p class="streamer-box-text" id="tmod_title" style="color:' + tmod_color + ';">' + tmod['title'] + '</p>';
+
+        }
+        html += '    </div>';
+        html += '  </div>';
+        html += '</div>';
+
+        html += '<div id="most_active_background" style="background-color:' + most_active_background + ';width:50%;height:100%;float:left;">';
+        html += '  <div class="streamer-box small">';
+        html += '    <div class="streamer-box-info">';
+        html += '      <p></p>';
+        html += '      <p class="streamer-box-header" id="most_active_label" style="color:' + most_active_color + ';">Most Active<br />Yesterday</p>';
+        html += '      <img src="' + most_active['photo_thumb_small'] + '" width="70" height="70" class="rounded-circle" />';
+        html += '      <p class="streamer-box-title" id="most_active_name" style="color:' + most_active_color + ';">' + most_active['name'] + '</p>';
+        if (most_active['title'].trim() != '') {
+          html += '    <p class="streamer-box-text" id="most_active_title" style="color:' + most_active_color + ';">' + most_active['title'] + '</p>';
+        }
+        html += '    </div>';
+        html += '  </div>';
+        html += '</div>';
+
+      } else {
+        // we don't seem to have any data/results to show (maybe b/c of error)
+        html += '<div id="error" style="background-color:#fff;width:100%;height:100%;float:left;">';
+        html += '  <div class="streamer-box small">';
+        html += '    <div class="streamer-box-info">';
+        html += '      <p></p>';
+        html += '      <p class="streamer-box-header" id="" style="color:#333;">Trouble loading data</p>';
+        html += '      <img src="images/avatar.jpg" width="70" height="70" class="rounded-circle" />';
+        html += '      <p class="streamer-box-title" id="" style="color:#333;">Sorry we could not load data for you at this moment. Please try again in a bit.</p>';
+        html += '    </div>';
+        html += '  </div>';
+        html += '</div>';
+
+      }
+
+      $('#tmod').html(html);
+      if (!show_most_active) {
+        $('#most_active_background').hide();
+        $('#tmod_background').css('width', '100%');
+      }
+
+      return;
+    }
+
+    /* stringify date */
+    function stringify_date(date) {
+      let mm = date.getMonth() + 1;
+      let dd = date.getDate();
+      let year = date.getFullYear();
+
+      return [
+        year,
+        (mm > 9 ? '' : '0') + mm,
+        (dd > 9 ? '' : '0') + dd
+      ].join('');
+    }
+
+    /* update settings from widget configuration */
+    function update_settings(res) {
+      let data = res['data'];
+
+      try {
+        tmod_background = data['tmod_background'];
+        if (tmod_background !== null) {
+          tmod_color = '#efe';
+        }
+
+        $('#tmod_background').css("background-color", tmod_background);
+        $('#tmod_label').css("color", tmod_color);
+        $('#tmod_name').css("color", tmod_color);
+        $('#tmod_title').css("color", tmod_color);
+
+      } catch(e) { }
+
+      try {
+        show_most_active = data['most_active'];
+        if (show_most_active) {
+          $('#most_active_background').show();
+          $('#tmod_background').css('width', '50%');
+
+        } else {
+          $('#most_active_background').hide();
+          $('#tmod_background').css('width', '100%');
+
+        }
+
+      } catch(e) { }
+
+      try {
+        most_active_background = data['most_active_background'];
+        if (most_active_background !== null) {
+          most_active_color = '#efe';
+        }
+
+        $('#most_active_background').css("background-color", most_active_background);
+        $('#most_active_label').css("color", most_active_color);
+        $('#most_active_name').css("color", most_active_color);
+        $('#most_active_title').css("color", most_active_color);
+
+      } catch(e) { }
+
+      return;
+    }
+
+    /* load data */
+    function load_data() {
+      const monday = window.mondaySdk();
+
+      monday.listen(['settings'], update_settings);
+
+      /* check the current user */
+      monday.api('query { users (kind: non_guests) { account{ id }, id, name, title, photo_thumb_small, photo_thumb } }').then(res => {
+        try {
+          let account_id = res['account_id'];
+          /* check if we have a team member of the day for this account_id already */
+          $.get('/monday/check_tmod', {'account_id': account_id}, function(data) {
+            if (!shuffle_tmod && (Object.keys(data).length > 0)) {
+              // update the display with this records details
+              render_tmod(data);
+
+            } else {
+              /* Get the list of users */
+              let user_list = res['data']['users'];
+              let users = [];
+              for (var i = 0; i < user_list.length; i++) {
+                if (user_list[i]['account']['id'] == account_id) {
+                  users.push(user_list[i]);
+                }
+              }
+
+              // also get the latest activity so we can also highlight yesterday's most active
+              monday.api('query { boards { activity_logs { account_id, id, created_at, user_id } } }').then(res => {
+                // limit the results to only the users who are part of this account (and active yesterday)
+                let activities = {};
+
+                let boards = res['data']['boards'];
+                for (var b = 0; b < boards.length; b++) {
+                  let activity_log = boards[b]['activity_logs'];
+                  for (var i = 0; i < activity_log.length; i++) {
+                    // limit to only those associated to this account
+                    if (activity_log[i]['account_id'] == account_id) {
+                      // limit to only those active yesterday
+                      let created_at = parseInt(activity_log[i]['created_at']);
+                      let created_at_date = new Date(created_at/1e4);
+                      let comp_date = stringify_date(created_at_date);
+                      if (comp_date == yesterday) {
+                        let user_id = activity_log[i]['user_id'];
+                        if (user_id in Object.keys(activities)) {
+                          activities[user_id] += 1;
+                        } else {
+                          activities[user_id] = 1;
+                        }
+                      }
+                    }
+                  }
+                }
+
+                let most_active = -1;
+                if (Object.keys(activities).length > 0) {
+                  // determine who had the most activity yesterday (activities[user_id] with highest count)
+                  most_active = Object.keys(activities).reduce(function(a, b){ return activities[a] > activities[b] ? a : b });
+
+                }
+
+                $.post('/monday/save_tmod', {'account_id':account_id, 'users':users, 'most_active':most_active}, function(data) {
+                  // update the display with this records details
+                  render_tmod(data);
+
+                });
+
+              });
+
+            }
+
+          });
+
+        } catch(err) {
+          // trouble grabbing data at the moment;
+          render_tmod({});
+
+        }
+
+      });
+
+      return;
+    }
+
+    load_data();
+
+  </script>
+</html>

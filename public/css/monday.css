@@ -1,0 +1,48 @@
+.streamer-background {
+  margin-right: -15px; // Remove right gap
+  margin-left: -15px;  // Remove left gap
+  padding-bottom: 62.5%; // ratio is 16:10
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.streamer-box {
+  border-radius:12px;
+  box-shadow:0 0 40px 0 rgba(94,92,154,.06)
+}
+.streamer-box.small .streamer-box-info .streamer-box-title {
+  font-size:1rem
+}
+.streamer-box .streamer-box-info {
+  padding:5px 5px 5px;
+  text-align:center;
+  position:relative
+}
+.streamer-box .streamer-box-info .streamer-box-header {
+  font-weight:400
+}
+.streamer-box .streamer-box-info .streamer-box-title {
+  margin-top: 5px;
+  font-size:1.125rem;
+  font-weight:700
+}
+.streamer-box .streamer-box-info .streamer-box-text {
+  margin-top:4px;
+  color:#3e3f5e;
+  font-size:.75rem;
+  font-weight:500
+}
+.streamer-box .streamer-box-info .streamer-box-status {
+  display:inline-block;
+  padding:0 6px;
+  border-radius:4px;
+  background-color:#adafca;
+  color:#fff;
+  font-size:.75rem;
+  font-weight:700;
+  line-height:18px;
+  text-transform:uppercase
+}
+.streamer-box .streamer-box-info .streamer-box-status.active {
+  background-color:#f1315e
+}
