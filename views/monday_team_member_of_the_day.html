@@ -33,10 +33,6 @@
     let show_most_active = false;
     let shuffle_tmod = false;
 
-    let temp = new Date();
-    temp.setDate(temp.getDate() - 1);
-    let yesterday = stringify_date(temp);
-
     /* render tmod */
     function render_tmod(data) {
       let html = '';
@@ -194,7 +190,7 @@
                 }
               }
 
-              // also get the latest activity so we can also highlight yesterday's most active
+              // also get the latest activity so we can also highlight most active
               monday.api('query { boards { activity_logs { account_id, id, created_at, user_id } } }').then(res => {
                 // limit the results to only the users who are part of this account (and active yesterday)
                 let activities = {};
@@ -205,17 +201,11 @@
                   for (var i = 0; i < activity_log.length; i++) {
                     // limit to only those associated to this account
                     if (activity_log[i]['account_id'] == account_id) {
-                      // limit to only those active yesterday
-                      let created_at = parseInt(activity_log[i]['created_at']);
-                      let created_at_date = new Date(created_at/1e4);
-                      let comp_date = stringify_date(created_at_date);
-                      if (comp_date == yesterday) {
-                        let user_id = activity_log[i]['user_id'];
-                        if (user_id in Object.keys(activities)) {
-                          activities[user_id] += 1;
-                        } else {
-                          activities[user_id] = 1;
-                        }
+                      let user_id = activity_log[i]['user_id'];
+                      if (user_id in Object.keys(activities)) {
+                        activities[user_id] += 1;
+                      } else {
+                        activities[user_id] = 1;
                       }
                     }
                   }
@@ -223,7 +213,7 @@
 
                 let most_active = -1;
                 if (Object.keys(activities).length > 0) {
-                  // determine who had the most activity yesterday (activities[user_id] with highest count)
+                  // determine who had the most activity (activities[user_id] with highest count)
                   most_active = Object.keys(activities).reduce(function(a, b){ return activities[a] > activities[b] ? a : b });
 
                 }
