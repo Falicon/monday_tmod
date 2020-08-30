@@ -13,6 +13,7 @@
     "debug": "^4.2.0",
     "express": "^4.17.1",
     "express-session": "^1.15.6",
+    "jsonwebtoken":"*",
     "mailgun": "*",
     "method-override": "^2.3.10",
     "monday-sdk-js": "*",

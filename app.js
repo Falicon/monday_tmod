@@ -4,6 +4,7 @@ var cookieParser = require('cookie-parser');
 var express = require('express');
 var favicon = require('static-favicon');
 var http = require('http');
+var jsonwebtoken = require('jsonwebtoken');
 var logger = require('morgan');
 var monday_sdk = require('monday-sdk-js');
 var mongo = require('mongodb');
@@ -44,6 +45,7 @@ app.use(cors());
 
 app.use(function(req, res, next){
   req.db = db;
+  req.jsonwebtoken = jsonwebtoken;
   req.monday_db = monday_db;
   next();
 });
